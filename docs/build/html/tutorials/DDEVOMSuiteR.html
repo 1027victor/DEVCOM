@@ -1,0 +1,486 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DEVCOMSuiteR Pipeline: Cell–Cell Communication and Pathway Analysis &mdash; DEVCOM 0.1.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=a58bc63e"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="&lt;no title&gt;" href="DDEVOMSuitepython.html" />
+    <link rel="prev" title="Tutorials" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            DEVCOM
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DEVCOMSuiteR Pipeline: Cell–Cell Communication and Pathway Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-and-environment">1. Data and Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#inference-of-cellcell-communication-networks">2. Inference of Cell–Cell Communication Networks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#communication-heatmap">3. Communication Heatmap</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#go-annotation-and-pathway-activity-analysis">4. GO Annotation and Pathway Activity Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#kegg-annotation-and-pathway-activity">5. KEGG Annotation and Pathway Activity</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#active-vs-inhibitory-signaling-classification">6. Active vs Inhibitory Signaling Classification</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#differential-communication-between-conditions">7. Differential Communication Between Conditions</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">DEVCOM</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Tutorials</a></li>
+      <li class="breadcrumb-item active">DEVCOMSuiteR Pipeline: Cell–Cell Communication and Pathway Analysis</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/tutorials/DDEVOMSuiteR.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="devcomsuiter-pipeline-cellcell-communication-and-pathway-analysis">
+<h1>DEVCOMSuiteR Pipeline: Cell–Cell Communication and Pathway Analysis<a class="headerlink" href="#devcomsuiter-pipeline-cellcell-communication-and-pathway-analysis" title="Link to this heading"></a></h1>
+</section>
+<section id="data-and-environment">
+<h1>1. Data and Environment<a class="headerlink" href="#data-and-environment" title="Link to this heading"></a></h1>
+<ul>
+<li><p><strong>Data source</strong>: <a class="reference external" href="https://drive.google.com/drive/folders/1KjQzdxW56pbZlQtwyb7e-GhN1XbgT1Rd">Google Drive folder</a></p></li>
+<li><p><strong>Main R packages</strong>:</p>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">DEVCOMSuiteR</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">DevcomDB</span><span class="p">)</span>
+</pre></div>
+</div>
+</li>
+</ul>
+<p>All paths in the examples below are given relative to the project root and can be adapted to your own directory structure.</p>
+</section>
+<section id="inference-of-cellcell-communication-networks">
+<h1>2. Inference of Cell–Cell Communication Networks<a class="headerlink" href="#inference-of-cellcell-communication-networks" title="Link to this heading"></a></h1>
+<section id="running-compute-cc-networks-devcom">
+<h2>2.1 Running <code class="docutils literal notranslate"><span class="pre">compute_cc_networks_devcom()</span></code><a class="headerlink" href="#running-compute-cc-networks-devcom" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">DEVCOMSuiteR</span><span class="p">)</span>
+
+<span class="n">res</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">compute_cc_networks_devcom</span><span class="p">(</span>
+<span class="w">  </span><span class="n">species</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;human&quot;</span><span class="p">,</span><span class="w">                 </span><span class="c1"># Species</span>
+<span class="w">  </span><span class="n">cell_types</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;EVT&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;CTB&quot;</span><span class="p">),</span><span class="w">         </span><span class="c1"># Optional subset of cell types</span>
+<span class="w">  </span><span class="n">filtered_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/CCI network&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">output_dir</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/CCI network&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">require_all_ligands</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span>
+<span class="w">  </span><span class="n">require_all_receptors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span>
+<span class="w">  </span><span class="n">build_autocrine</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span>
+<span class="w">  </span><span class="n">build_pairwise</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span>
+<span class="w">  </span><span class="n">write_lr_unique</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span>
+<span class="w">  </span><span class="n">write_counts</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span>
+<span class="w">  </span><span class="n">verbose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example console output</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>[autocrine] EVT ...
+[autocrine] CTB ...
+[pairwise] EVT -&gt; CTB ...
+[pairwise] CTB -&gt; EVT ...
+</pre></div>
+</div>
+<p>The function computes autocrine (self) and pairwise (between-cell-type) communication networks and writes the corresponding ligand–receptor (LR) and count files into the specified <code class="docutils literal notranslate"><span class="pre">output_dir</span></code>.</p>
+</section>
+</section>
+<section id="communication-heatmap">
+<h1>3. Communication Heatmap<a class="headerlink" href="#communication-heatmap" title="Link to this heading"></a></h1>
+<section id="plotting-global-communication-strength">
+<h2>3.1 Plotting global communication strength<a class="headerlink" href="#plotting-global-communication-strength" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">DEVCOMSuiteR</span><span class="p">)</span>
+
+<span class="nf">plot_comm_heatmap</span><span class="p">(</span>
+<span class="w">  </span><span class="n">input_file</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/heatmap/cell_communication_summary-LR.csv&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">output_file</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/heatmap/IVF_Heatmap.pdf&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">title</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;IVF&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">legend_title</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;MAX LRI&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">text_threshold</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">100</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>This function reads a summary file of LR interaction strength between cell types and generates a PDF heatmap showing the maximum ligand–receptor interaction (LRI) scores between each pair of cell types.</p>
+</section>
+</section>
+<section id="go-annotation-and-pathway-activity-analysis">
+<h1>4. GO Annotation and Pathway Activity Analysis<a class="headerlink" href="#go-annotation-and-pathway-activity-analysis" title="Link to this heading"></a></h1>
+<section id="go-block-construction-and-integration">
+<h2>4.1 GO block construction and integration<a class="headerlink" href="#go-block-construction-and-integration" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">DEVCOMSuiteR</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
+
+<span class="n">res</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">compute_go_blocks_and_integrate</span><span class="p">(</span>
+<span class="w">  </span><span class="n">input_dir</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">output_dir</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">org_db</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="n">org.Hs.eg.db</span><span class="p">,</span><span class="w">    </span><span class="c1"># Human</span>
+<span class="w">  </span><span class="n">stages</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;extract_blocks&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;build_complex&quot;</span><span class="p">,</span>
+<span class="w">                  </span><span class="s">&quot;alias_normalize&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;go_annot&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;integrate&quot;</span><span class="p">),</span>
+<span class="w">  </span><span class="n">which_files</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;autocrine&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;pairwise&quot;</span><span class="p">),</span><span class="w">  </span><span class="c1"># Only autocrine: c(&quot;autocrine&quot;); only intercellular: c(&quot;pairwise&quot;)</span>
+<span class="w">  </span><span class="n">use_obo</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w">                         </span><span class="c1"># Use OBO ancestor sets for GO intersection (recommended)</span>
+<span class="w">  </span><span class="n">verbose</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example console output</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Stage 1: extracting LR / RTF / TFT blocks ...
+✓ Stage 1 done, 6 block files written.
+Stage 2: building complex (multi-subunit) pairs ...
+✓ Stage 2 done, 4 complex files written.
+Stage 3: alias normalisation (ALIAS → SYMBOL) ...
+&#39;select()&#39; returned 1:many mapping between keys and columns
+✓ Stage 3 done, 4 alias-normalised files written.
+Stage 4: GO annotation ...
+&#39;select()&#39; returned 1:many mapping between keys and columns
+&#39;select()&#39; returned 1:many mapping between keys and columns
+&#39;select()&#39; returned 1:many mapping between keys and columns
+&#39;select()&#39; returned 1:many mapping between keys and columns
+&#39;select()&#39; returned 1:many mapping between keys and columns
+✓ Stage 4 done, 10 GO-annotated files written.
+Stage 5: integrating GO annotations from LR / RTF / TFT ...
+Skipping prefix CTB: required columns missing after merging.
+Skipping prefix CTB: required columns missing after merging.
+Skipping prefix CTB: required columns missing after merging.
+Skipping prefix CTB: required columns missing after merging.
+Skipping prefix CTB_to_EVT: required columns missing after merging.
+Skipping prefix CTB_to_EVT: required columns missing after merging.
+Skipping prefix CTB_to_EVT: required columns missing after merging.
+Skipping prefix CTB_to_EVT: required columns missing after merging.
+✓ Stage 5 done, 0 integrated L–R–TF–Target GO files written.
+Warning message:
+Unknown or uninitialised column: `GO`.
+</pre></div>
+</div>
+<p>Here, GO blocks are constructed for ligand–receptor (LR), receptor–TF (RTF), and TF–target (TFT) components, followed by complex assembly, alias normalization, and GO term annotation. The integration step may skip some prefixes if required columns are missing.</p>
+</section>
+<section id="merging-go-blocks-across-lr-rtf-tft">
+<h2>4.2 Merging GO blocks across LR / RTF / TFT<a class="headerlink" href="#merging-go-blocks-across-lr-rtf-tft" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">DEVCOMSuiteR</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
+
+<span class="n">res_files</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">integrate_go_lr_rtf_tft</span><span class="p">(</span>
+<span class="w">  </span><span class="n">lr_dir</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation/LR&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">rtf_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation/RTF&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">tft_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation/TFT&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">out_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation/integrated&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">verbose</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example console output</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Integrating GO blocks for prefix: CTB
+  Saved: E:/DEVCOM Suite/tests/testthat/go-annotation/integrated/CTB_GO_L_R_TF_Target.csv
+Integrating GO blocks for prefix: CTB_to_EVT
+  Saved: E:/DEVCOM Suite/tests/testthat/go-annotation/integrated/CTB_to_EVT_GO_L_R_TF_Target.csv
+</pre></div>
+</div>
+<p>This step merges LR, RTF, and TFT GO annotations into unified L–R–TF–target tables for each prefix (e.g. <code class="docutils literal notranslate"><span class="pre">CTB</span></code>, <code class="docutils literal notranslate"><span class="pre">CTB_to_EVT</span></code>).</p>
+</section>
+<section id="go-pathway-activity-for-a-single-file">
+<h2>4.3 GO pathway activity for a single file<a class="headerlink" href="#go-pathway-activity-for-a-single-file" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">res1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">go_pathway_activity_for_file</span><span class="p">(</span>
+<span class="w">  </span><span class="n">comm_file</span><span class="w">         </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation/integrated/CTB_to_EVT_GO_L_R_TF_Target.csv&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">ligand_score_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation/CTB_gene_importance_scores_transformed.csv&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">target_score_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation/EVT_gene_importance_scores_transformed.csv&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">output_dir</span><span class="w">        </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation/Go_out/&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">ontology</span><span class="w">          </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;BP&quot;</span><span class="w">    </span><span class="c1"># or c(&quot;BP&quot;, &quot;MF&quot;) or &quot;ALL&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example console output</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>已保存：E:\DEVCOM Suite\tests\testthat\go-annotation\Go_out\/CTB_to_EVT_GO_BP_pathway_activity.csv
+</pre></div>
+</div>
+<p>The message indicates that a GO biological process (BP) pathway activity file for CTB → EVT communication has been saved.</p>
+</section>
+<section id="batch-go-pathway-activity-over-a-directory">
+<h2>4.4 Batch GO pathway activity over a directory<a class="headerlink" href="#batch-go-pathway-activity-over-a-directory" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">go_pathway_activity_dir</span><span class="p">(</span>
+<span class="w">  </span><span class="n">input_dir</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation/integrated/&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">output_dir</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation/paythway score&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">ontology</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;BP&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">ligand_suffix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;_gene_importance_scores_transformed.csv&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example console output</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>已保存：E:\DEVCOM Suite\tests\testthat\go-annotation\paythway score/CTB_GO_BP_pathway_activity_autocrine.csv
+已保存：E:\DEVCOM Suite\tests\testthat\go-annotation\paythway score/CTB_to_EVT_GO_BP_pathway_activity.csv
+</pre></div>
+</div>
+<p>This function automatically matches ligand and target score files by filename and computes GO pathway activity scores for all integrated communication files.</p>
+</section>
+</section>
+<section id="kegg-annotation-and-pathway-activity">
+<h1>5. KEGG Annotation and Pathway Activity<a class="headerlink" href="#kegg-annotation-and-pathway-activity" title="Link to this heading"></a></h1>
+<section id="kegg-annotation-for-lr-rtf-tft-blocks">
+<h2>5.1 KEGG annotation for LR / RTF / TFT blocks<a class="headerlink" href="#kegg-annotation-for-lr-rtf-tft-blocks" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">DEVCOMSuiteR</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
+
+<span class="nf">compute_kegg_annotations_blocks</span><span class="p">(</span>
+<span class="w">  </span><span class="n">root_dir</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">output_root</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">species</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;human&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example console output</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Fetching KEGG pathway list for organism &#39;hsa&#39; ...
+== LR block: in E:\DEVCOM Suite\tests\testthat\go-annotation/LR -&gt; out E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result/LR ==
+  [KEGG] CTB_LR_block_complex_alias_replaced_GO_annotation.csv
+    -&gt; wrote CTB_LR_block_complex_alias_replaced_GO_annotation_KEGG.csv
+  [KEGG] CTB_to_EVT_LR_block_complex_alias_replaced_GO_annotation.csv
+    -&gt; wrote CTB_to_EVT_LR_block_complex_alias_replaced_GO_annotation_KEGG.csv
+    -&gt; wrote CTB_LR_block_complex_alias_replaced_GO_annotation_KEGG_with_names.csv
+    -&gt; wrote CTB_to_EVT_LR_block_complex_alias_replaced_GO_annotation_KEGG_with_names.csv
+== RTF block: in E:\DEVCOM Suite\tests\testthat\go-annotation/RTF -&gt; out E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result/RTF ==
+  [KEGG] CTB_RTF_block_complex_alias_replaced_GO_annotation.csv
+    -&gt; wrote CTB_RTF_block_complex_alias_replaced_GO_annotation_KEGG.csv
+  [KEGG] CTB_to_EVT_RTF_block_complex_alias_replaced_GO_annotation.csv
+    -&gt; wrote CTB_to_EVT_RTF_block_complex_alias_replaced_GO_annotation_KEGG.csv
+    -&gt; wrote CTB_RTF_block_complex_alias_replaced_GO_annotation_KEGG_with_names.csv
+    -&gt; wrote CTB_to_EVT_RTF_block_complex_alias_replaced_GO_annotation_KEGG_with_names.csv
+== TFT block: in E:\DEVCOM Suite\tests\testthat\go-annotation/TFT -&gt; out E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result/TFT ==
+  [KEGG] CTB_TFT_block_TF_Target_GO_annotation.csv
+    -&gt; wrote CTB_TFT_block_TF_Target_GO_annotation_KEGG.csv
+  [KEGG] CTB_to_EVT_TFT_block_TF_Target_GO_annotation.csv
+    -&gt; wrote CTB_to_EVT_TFT_block_TF_Target_GO_annotation_KEGG.csv
+    -&gt; wrote CTB_TFT_block_TF_Target_GO_annotation_KEGG_with_names.csv
+    -&gt; wrote CTB_to_EVT_TFT_block_TF_Target_GO_annotation_KEGG_with_names.csv
+</pre></div>
+</div>
+</section>
+<section id="integrating-kegg-annotations-across-lr-rtf-tft">
+<h2>5.2 Integrating KEGG annotations across LR / RTF / TFT<a class="headerlink" href="#integrating-kegg-annotations-across-lr-rtf-tft" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">DEVCOMSuiteR</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
+
+<span class="n">res_files</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">integrate_kegg_lr_rtf_tft</span><span class="p">(</span>
+<span class="w">  </span><span class="n">lr_dir</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/LR&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">rtf_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/RTF&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">tft_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/TFT&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">out_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/integrated&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example console output</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Found 2 common keys across LR/RTF/TFT.
+---- Integrating KEGG for key: CTB ----
+  Matched LR–RTF rows: 11
+  After merging TFT: 907 rows.
+  -&gt; Saved: E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated/CTB_merged_LR_RTF_TFT.csv
+
+---- Integrating KEGG for key: CTB_to_EVT ----
+  Matched LR–RTF rows: 28
+  After merging TFT: 796 rows.
+  -&gt; Saved: E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated/CTB_to_EVT_merged_LR_RTF_TFT.csv
+</pre></div>
+</div>
+</section>
+<section id="kegg-pathway-activity-scores">
+<h2>5.3 KEGG pathway activity scores<a class="headerlink" href="#kegg-pathway-activity-scores" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">tidyverse</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">DEVCOMSuiteR</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">org.Hs.eg.db</span><span class="p">)</span>
+
+<span class="nf">kegg_pathway_activity_dir</span><span class="p">(</span>
+<span class="w">  </span><span class="n">input_dir</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/integrated/&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">output_dir</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/integrated/keggpathway score&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">pattern</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;_merged_LR_RTF_TFT\\.csv$&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">ligand_suffix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;_gene_importance_scores_transformed.csv&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">target_suffix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;_gene_importance_scores_transformed.csv&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">split_complex</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">,</span>
+<span class="w">  </span><span class="n">weighting</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;count&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example console output</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>已保存：E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated\keggpathway score/CTB_autocrine_pathway_activity.csv
+已保存：E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated\keggpathway score/CTB_to_EVT_pathway_activity.csv
+</pre></div>
+</div>
+<p>The output files contain KEGG pathway activity scores for autocrine CTB signaling and CTB → EVT interactions.</p>
+</section>
+<section id="selecting-developmental-kegg-pathways">
+<h2>5.4 Selecting developmental KEGG pathways<a class="headerlink" href="#selecting-developmental-kegg-pathways" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">filter_kegg_activity_by_keywords</span><span class="p">(</span>
+<span class="w">  </span><span class="n">input_dir</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/integrated/keggpathway score&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">output_dir</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/integrated/keggpathway score/development pathway&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">keywords_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/development.txt&quot;</span><span class="w">  </span><span class="c1"># Keywords for developmental pathways</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example console output</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>已筛出并保存：E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated\keggpathway score\development pathway/CTB_autocrine_pathway_activity.csv
+已筛出并保存：E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated\keggpathway score\development pathway/CTB_to_EVT_pathway_activity.csv
+</pre></div>
+</div>
+<p>Pathways whose names contain the specified developmental keywords are filtered and written to a dedicated output directory.</p>
+</section>
+</section>
+<section id="active-vs-inhibitory-signaling-classification">
+<h1>6. Active vs Inhibitory Signaling Classification<a class="headerlink" href="#active-vs-inhibitory-signaling-classification" title="Link to this heading"></a></h1>
+<p>DEVCOM provides a module to classify signaling as active or inhibitory based on expression and prior knowledge.</p>
+<section id="computing-active-inhibitory-signaling-scores">
+<h2>6.1 Computing active/inhibitory signaling scores<a class="headerlink" href="#computing-active-inhibitory-signaling-scores" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">DEVCOMSuiteR</span><span class="p">)</span>
+
+<span class="n">res</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">compute_active_inhibit</span><span class="p">(</span>
+<span class="w">  </span><span class="n">expr_dir</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/IVF&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">kb_path</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/mouse_L-R-TF_develop.csv&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">output_dir</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/active_inhibit/&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">test</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;none&quot;</span><span class="p">,</span><span class="w">          </span><span class="c1"># &quot;none&quot; | &quot;wilcoxon&quot; | &quot;ttest&quot;</span>
+<span class="w">  </span><span class="n">min_expr</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="m">0</span><span class="p">,</span><span class="w">               </span><span class="c1"># Low-expression filtering threshold</span>
+<span class="w">  </span><span class="n">include_pairwise</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span>
+<span class="w">  </span><span class="n">ordered_pairs</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="kc">FALSE</span><span class="p">,</span>
+<span class="w">  </span><span class="n">p_adjust</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;none&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">p_min</span><span class="w">       </span><span class="o">=</span><span class="w"> </span><span class="m">1e-300</span><span class="p">,</span>
+<span class="w">  </span><span class="n">write_coverage</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span><span class="p">,</span><span class="w">        </span><span class="c1"># Also output gene coverage and missing-value statistics</span>
+<span class="w">  </span><span class="n">verbose</span><span class="w">     </span><span class="o">=</span><span class="w"> </span><span class="kc">TRUE</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example console output</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>New names:
+  • `` -&gt; `...1`
+New names:
+  • `` -&gt; `...1`
+[pair] Endothelial_filtered -&gt; Erythrocyte_filtered ...
+[pair] Erythrocyte_filtered -&gt; Endothelial_filtered ...
+</pre></div>
+</div>
+<p>The function computes active/inhibitory communication scores between cell types and outputs both score matrices and coverage summaries.</p>
+</section>
+<section id="global-communication-circos-plot">
+<h2>6.2 Global communication circos plot<a class="headerlink" href="#global-communication-circos-plot" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">DEVCOMSuiteR</span><span class="p">)</span>
+
+<span class="n">cell_types</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;Decidual stroma&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Endothelial&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Erythrocyte&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Immune cell&quot;</span><span class="p">)</span>
+
+<span class="nf">plot_global_comm_circos</span><span class="p">(</span>
+<span class="w">  </span><span class="n">cell_types</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">cell_types</span><span class="p">,</span>
+<span class="w">  </span><span class="n">base_path</span><span class="w">  </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/active_inhibit/active_inhibit_score&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>This generates a circos plot summarizing global communication intensity and direction between the specified cell types, using the active/inhibitory scores calculated above.</p>
+</section>
+</section>
+<section id="differential-communication-between-conditions">
+<h1>7. Differential Communication Between Conditions<a class="headerlink" href="#differential-communication-between-conditions" title="Link to this heading"></a></h1>
+<section id="running-differential-communication-analysis">
+<h2>7.1 Running differential communication analysis<a class="headerlink" href="#running-differential-communication-analysis" title="Link to this heading"></a></h2>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">DEVCOMSuiteR</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="n">DevcomDB</span><span class="p">)</span>
+
+<span class="n">res</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">run_diff_comm</span><span class="p">(</span>
+<span class="w">  </span><span class="n">cell_types</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="nf">c</span><span class="p">(</span><span class="s">&quot;Erythrocyte&quot;</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Endothelial&quot;</span><span class="p">),</span>
+<span class="w">  </span><span class="n">ctrl_base</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/IVF/&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">case_base</span><span class="w">    </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/SCNT/&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">lr_pairs_path</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/testst/mouse_L-R-TF_develop.csv&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">out_dir</span><span class="w">      </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;./DEVCOM-Suite-R-main/tests/diff_comm_IVF_SCNT&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">case_label</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;SCNT&quot;</span><span class="p">,</span>
+<span class="w">  </span><span class="n">ctrl_label</span><span class="w">   </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;IVF&quot;</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><strong>Example console output</strong></p>
+<div class="highlight-text notranslate"><div class="highlight"><pre><span></span>Loading control condition (IVF) ...
+Loading case condition (SCNT) ...
+Analyzing autocrine (self) communications ...
+Analyzing interactions (sender != receiver) ...
+Finished. Output files:
+  - E:/DEVCOM Suite/tests/testthat/diff_comm_IVF_SCNT/SCNT_vs_IVF_diff_comm_autocrine_interaction.csv
+  - E:/DEVCOM Suite/tests/testthat/diff_comm_IVF_SCNT/SCNT_vs_IVF_diff_comm_autocrine_only.csv
+  - E:/DEVCOM Suite/tests/testthat/diff_comm_IVF_SCNT/SCNT_vs_IVF_diff_comm_interaction_only.csv
+Number of permutations (n_perm) = 1000
+</pre></div>
+</div>
+<p>This analysis compares communication strength between the control (IVF) and case (SCNT) conditions for the selected cell types. Permutation testing (here <code class="docutils literal notranslate"><span class="pre">n_perm</span> <span class="pre">=</span> <span class="pre">1000</span></code>) is used to assess significant differences in communication.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="DDEVOMSuitepython.html" class="btn btn-neutral float-right" title="&lt;no title&gt;" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2025, wuguanhao.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

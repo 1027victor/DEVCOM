@@ -1,0 +1,460 @@
+DEVCOMSuiteR Pipeline: Cell–Cell Communication and Pathway Analysis
+===================================================================
+
+.. contents::
+   :depth: 2
+   :local:
+
+
+1. Data and Environment
+=======================
+
+- **Data source**: `Google Drive folder <https://drive.google.com/drive/folders/1KjQzdxW56pbZlQtwyb7e-GhN1XbgT1Rd>`_
+- **Main R packages**:
+
+  .. code-block:: r
+
+     library(tidyverse)
+     library(DEVCOMSuiteR)
+     library(org.Hs.eg.db)
+     library(DevcomDB)
+
+All paths in the examples below are given relative to the project root and can be adapted to your own directory structure.
+
+
+2. Inference of Cell–Cell Communication Networks
+================================================
+
+2.1 Running ``compute_cc_networks_devcom()``
+--------------------------------------------
+
+.. code-block:: r
+
+   library(tidyverse)
+   library(DEVCOMSuiteR)
+
+   res <- compute_cc_networks_devcom(
+     species      = "human",                 # Species
+     cell_types   = c("EVT", "CTB"),         # Optional subset of cell types
+     filtered_dir = "./DEVCOM-Suite-R-main/tests/CCI network",
+     output_dir   = "./DEVCOM-Suite-R-main/tests/CCI network",
+     require_all_ligands   = TRUE,
+     require_all_receptors = TRUE,
+     build_autocrine = TRUE,
+     build_pairwise  = TRUE,
+     write_lr_unique = TRUE,
+     write_counts    = TRUE,
+     verbose = TRUE
+   )
+
+**Example console output**
+
+.. code-block:: text
+
+   [autocrine] EVT ...
+   [autocrine] CTB ...
+   [pairwise] EVT -> CTB ...
+   [pairwise] CTB -> EVT ...
+
+The function computes autocrine (self) and pairwise (between-cell-type) communication networks and writes the corresponding ligand–receptor (LR) and count files into the specified ``output_dir``.
+
+
+3. Communication Heatmap
+========================
+
+3.1 Plotting global communication strength
+------------------------------------------
+
+.. .. code-block:: r
+
+..    library(DEVCOMSuiteR)
+
+..    plot_comm_heatmap(
+..      input_file   = "./DEVCOM-Suite-R-main/tests/heatmap/cell_communication_summary-LR.csv",
+..      output_file  = "./DEVCOM-Suite-R-main/tests/heatmap/IVF_Heatmap.pdf",
+..      title        = "IVF",
+..      legend_title = "MAX LRI",
+..      text_threshold = 100
+..    )
+
+ .. code-block:: r
+
+   library(DEVCOMSuiteR)
+
+   plot_comm_heatmap(
+     input_file   = "./DEVCOM-Suite-R-main/tests/heatmap/cell_communication_summary-LR.csv",
+     output_file  = "./DEVCOM-Suite-R-main/tests/heatmap/IVF_Heatmap.pdf",
+     title        = "IVF",
+     legend_title = "MAX LRI",
+     text_threshold = 100
+   )
+
+.. figure:: /_static/图片1.png
+   :width: 70%
+   :align: center
+
+
+
+This function reads a summary file of LR interaction strength between cell types and generates a PDF heatmap showing the maximum ligand–receptor interaction (LRI) scores between each pair of cell types.
+
+
+1. GO Annotation and Pathway Activity Analysis
+==============================================
+
+4.1 GO block construction and integration
+-----------------------------------------
+
+.. code-block:: r
+
+   library(tidyverse)
+   library(DEVCOMSuiteR)
+   library(org.Hs.eg.db)
+
+   res <- compute_go_blocks_and_integrate(
+     input_dir   = "./DEVCOM-Suite-R-main/tests/go-annotation",
+     output_dir  = "./DEVCOM-Suite-R-main/tests/go-annotation",
+     org_db      = org.Hs.eg.db,    # Human
+     stages      = c("extract_blocks", "build_complex",
+                     "alias_normalize", "go_annot", "integrate"),
+     which_files = c("autocrine", "pairwise"),  # Only autocrine: c("autocrine"); only intercellular: c("pairwise")
+     use_obo     = TRUE,                         # Use OBO ancestor sets for GO intersection (recommended)
+     verbose     = TRUE
+   )
+
+**Example console output**
+
+.. code-block:: text
+
+   Stage 1: extracting LR / RTF / TFT blocks ...
+   ✓ Stage 1 done, 6 block files written.
+   Stage 2: building complex (multi-subunit) pairs ...
+   ✓ Stage 2 done, 4 complex files written.
+   Stage 3: alias normalisation (ALIAS → SYMBOL) ...
+   'select()' returned 1:many mapping between keys and columns
+   ✓ Stage 3 done, 4 alias-normalised files written.
+   Stage 4: GO annotation ...
+   'select()' returned 1:many mapping between keys and columns
+   'select()' returned 1:many mapping between keys and columns
+   'select()' returned 1:many mapping between keys and columns
+   'select()' returned 1:many mapping between keys and columns
+   'select()' returned 1:many mapping between keys and columns
+   ✓ Stage 4 done, 10 GO-annotated files written.
+   Stage 5: integrating GO annotations from LR / RTF / TFT ...
+   Skipping prefix CTB: required columns missing after merging.
+   Skipping prefix CTB: required columns missing after merging.
+   Skipping prefix CTB: required columns missing after merging.
+   Skipping prefix CTB: required columns missing after merging.
+   Skipping prefix CTB_to_EVT: required columns missing after merging.
+   Skipping prefix CTB_to_EVT: required columns missing after merging.
+   Skipping prefix CTB_to_EVT: required columns missing after merging.
+   Skipping prefix CTB_to_EVT: required columns missing after merging.
+   ✓ Stage 5 done, 0 integrated L–R–TF–Target GO files written.
+   Warning message:
+   Unknown or uninitialised column: `GO`.
+
+Here, GO blocks are constructed for ligand–receptor (LR), receptor–TF (RTF), and TF–target (TFT) components, followed by complex assembly, alias normalization, and GO term annotation. The integration step may skip some prefixes if required columns are missing.
+
+
+4.2 Merging GO blocks across LR / RTF / TFT
+-------------------------------------------
+
+.. code-block:: r
+
+   library(tidyverse)
+   library(DEVCOMSuiteR)
+   library(org.Hs.eg.db)
+
+   res_files <- integrate_go_lr_rtf_tft(
+     lr_dir  = "./DEVCOM-Suite-R-main/tests/go-annotation/LR",
+     rtf_dir = "./DEVCOM-Suite-R-main/tests/go-annotation/RTF",
+     tft_dir = "./DEVCOM-Suite-R-main/tests/go-annotation/TFT",
+     out_dir = "./DEVCOM-Suite-R-main/tests/go-annotation/integrated",
+     verbose = TRUE
+   )
+
+**Example console output**
+
+.. code-block:: text
+
+   Integrating GO blocks for prefix: CTB
+     Saved: E:/DEVCOM Suite/tests/testthat/go-annotation/integrated/CTB_GO_L_R_TF_Target.csv
+   Integrating GO blocks for prefix: CTB_to_EVT
+     Saved: E:/DEVCOM Suite/tests/testthat/go-annotation/integrated/CTB_to_EVT_GO_L_R_TF_Target.csv
+
+This step merges LR, RTF, and TFT GO annotations into unified L–R–TF–target tables for each prefix (e.g. ``CTB``, ``CTB_to_EVT``).
+
+
+4.3 GO pathway activity for a single file
+-----------------------------------------
+
+.. code-block:: r
+
+   res1 <- go_pathway_activity_for_file(
+     comm_file         = "./DEVCOM-Suite-R-main/tests/go-annotation/integrated/CTB_to_EVT_GO_L_R_TF_Target.csv",
+     ligand_score_file = "./DEVCOM-Suite-R-main/tests/go-annotation/CTB_gene_importance_scores_transformed.csv",
+     target_score_file = "./DEVCOM-Suite-R-main/tests/go-annotation/EVT_gene_importance_scores_transformed.csv",
+     output_dir        = "./DEVCOM-Suite-R-main/tests/go-annotation/Go_out/",
+     ontology          = "BP"    # or c("BP", "MF") or "ALL"
+   )
+
+**Example console output**
+
+.. code-block:: text
+
+   已保存：E:\DEVCOM Suite\tests\testthat\go-annotation\Go_out\/CTB_to_EVT_GO_BP_pathway_activity.csv
+
+The message indicates that a GO biological process (BP) pathway activity file for CTB → EVT communication has been saved.
+
+
+4.4 Batch GO pathway activity over a directory
+----------------------------------------------
+
+.. code-block:: r
+
+   go_pathway_activity_dir(
+     input_dir     = "./DEVCOM-Suite-R-main/tests/go-annotation/integrated/",
+     output_dir    = "./DEVCOM-Suite-R-main/tests/go-annotation/paythway score",
+     ontology      = "BP",
+     ligand_suffix = "_gene_importance_scores_transformed.csv"
+   )
+
+**Example console output**
+
+.. code-block:: text
+
+   已保存：E:\DEVCOM Suite\tests\testthat\go-annotation\paythway score/CTB_GO_BP_pathway_activity_autocrine.csv
+   已保存：E:\DEVCOM Suite\tests\testthat\go-annotation\paythway score/CTB_to_EVT_GO_BP_pathway_activity.csv
+
+This function automatically matches ligand and target score files by filename and computes GO pathway activity scores for all integrated communication files.
+
+
+5. KEGG Annotation and Pathway Activity
+=======================================
+
+5.1 KEGG annotation for LR / RTF / TFT blocks
+---------------------------------------------
+
+.. code-block:: r
+
+   library(tidyverse)
+   library(DEVCOMSuiteR)
+   library(org.Hs.eg.db)
+
+   compute_kegg_annotations_blocks(
+     root_dir    = "./DEVCOM-Suite-R-main/tests/go-annotation",
+     output_root = "./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result",
+     species     = "human"
+   )
+
+**Example console output**
+
+.. code-block:: text
+
+   Fetching KEGG pathway list for organism 'hsa' ...
+   == LR block: in E:\DEVCOM Suite\tests\testthat\go-annotation/LR -> out E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result/LR ==
+     [KEGG] CTB_LR_block_complex_alias_replaced_GO_annotation.csv
+       -> wrote CTB_LR_block_complex_alias_replaced_GO_annotation_KEGG.csv
+     [KEGG] CTB_to_EVT_LR_block_complex_alias_replaced_GO_annotation.csv
+       -> wrote CTB_to_EVT_LR_block_complex_alias_replaced_GO_annotation_KEGG.csv
+       -> wrote CTB_LR_block_complex_alias_replaced_GO_annotation_KEGG_with_names.csv
+       -> wrote CTB_to_EVT_LR_block_complex_alias_replaced_GO_annotation_KEGG_with_names.csv
+   == RTF block: in E:\DEVCOM Suite\tests\testthat\go-annotation/RTF -> out E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result/RTF ==
+     [KEGG] CTB_RTF_block_complex_alias_replaced_GO_annotation.csv
+       -> wrote CTB_RTF_block_complex_alias_replaced_GO_annotation_KEGG.csv
+     [KEGG] CTB_to_EVT_RTF_block_complex_alias_replaced_GO_annotation.csv
+       -> wrote CTB_to_EVT_RTF_block_complex_alias_replaced_GO_annotation_KEGG.csv
+       -> wrote CTB_RTF_block_complex_alias_replaced_GO_annotation_KEGG_with_names.csv
+       -> wrote CTB_to_EVT_RTF_block_complex_alias_replaced_GO_annotation_KEGG_with_names.csv
+   == TFT block: in E:\DEVCOM Suite\tests\testthat\go-annotation/TFT -> out E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result/TFT ==
+     [KEGG] CTB_TFT_block_TF_Target_GO_annotation.csv
+       -> wrote CTB_TFT_block_TF_Target_GO_annotation_KEGG.csv
+     [KEGG] CTB_to_EVT_TFT_block_TF_Target_GO_annotation.csv
+       -> wrote CTB_to_EVT_TFT_block_TF_Target_GO_annotation_KEGG.csv
+       -> wrote CTB_TFT_block_TF_Target_GO_annotation_KEGG_with_names.csv
+       -> wrote CTB_to_EVT_TFT_block_TF_Target_GO_annotation_KEGG_with_names.csv
+
+
+5.2 Integrating KEGG annotations across LR / RTF / TFT
+------------------------------------------------------
+
+.. code-block:: r
+
+   library(tidyverse)
+   library(DEVCOMSuiteR)
+   library(org.Hs.eg.db)
+
+   res_files <- integrate_kegg_lr_rtf_tft(
+     lr_dir  = "./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/LR",
+     rtf_dir = "./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/RTF",
+     tft_dir = "./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/TFT",
+     out_dir = "./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/integrated"
+   )
+
+**Example console output**
+
+.. code-block:: text
+
+   Found 2 common keys across LR/RTF/TFT.
+   ---- Integrating KEGG for key: CTB ----
+     Matched LR–RTF rows: 11
+     After merging TFT: 907 rows.
+     -> Saved: E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated/CTB_merged_LR_RTF_TFT.csv
+
+   ---- Integrating KEGG for key: CTB_to_EVT ----
+     Matched LR–RTF rows: 28
+     After merging TFT: 796 rows.
+     -> Saved: E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated/CTB_to_EVT_merged_LR_RTF_TFT.csv
+
+
+5.3 KEGG pathway activity scores
+--------------------------------
+
+.. code-block:: r
+
+   library(tidyverse)
+   library(DEVCOMSuiteR)
+   library(org.Hs.eg.db)
+
+   kegg_pathway_activity_dir(
+     input_dir    = "./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/integrated/",
+     output_dir   = "./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/integrated/keggpathway score",
+     pattern      = "_merged_LR_RTF_TFT\\.csv$",
+     ligand_suffix = "_gene_importance_scores_transformed.csv",
+     target_suffix = "_gene_importance_scores_transformed.csv",
+     split_complex = FALSE,
+     weighting     = "count"
+   )
+
+**Example console output**
+
+.. code-block:: text
+
+   已保存：E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated\keggpathway score/CTB_autocrine_pathway_activity.csv
+   已保存：E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated\keggpathway score/CTB_to_EVT_pathway_activity.csv
+
+The output files contain KEGG pathway activity scores for autocrine CTB signaling and CTB → EVT interactions.
+
+
+5.4 Selecting developmental KEGG pathways
+-----------------------------------------
+
+.. code-block:: r
+
+   filter_kegg_activity_by_keywords(
+     input_dir    = "./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/integrated/keggpathway score",
+     output_dir   = "./DEVCOM-Suite-R-main/tests/go-annotation_kegg_result/integrated/keggpathway score/development pathway",
+     keywords_file = "./DEVCOM-Suite-R-main/tests/development.txt"  # Keywords for developmental pathways
+   )
+
+**Example console output**
+
+.. code-block:: text
+
+   已筛出并保存：E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated\keggpathway score\development pathway/CTB_autocrine_pathway_activity.csv
+   已筛出并保存：E:\DEVCOM Suite\tests\testthat\go-annotation_kegg_result\integrated\keggpathway score\development pathway/CTB_to_EVT_pathway_activity.csv
+
+Pathways whose names contain the specified developmental keywords are filtered and written to a dedicated output directory.
+
+
+6. Active vs Inhibitory Signaling Classification
+================================================
+
+DEVCOM provides a module to classify signaling as active or inhibitory based on expression and prior knowledge.
+
+
+6.1 Computing active/inhibitory signaling scores
+------------------------------------------------
+
+.. code-block:: r
+
+   library(DEVCOMSuiteR)
+
+   res <- compute_active_inhibit(
+     expr_dir   = "./DEVCOM-Suite-R-main/tests/IVF",
+     kb_path    = "./DEVCOM-Suite-R-main/tests/mouse_L-R-TF_develop.csv",
+     output_dir = "./DEVCOM-Suite-R-main/tests/active_inhibit/",
+     test       = "none",          # "none" | "wilcoxon" | "ttest"
+     min_expr   = 0,               # Low-expression filtering threshold
+     include_pairwise = TRUE,
+     ordered_pairs    = FALSE,
+     p_adjust    = "none",
+     p_min       = 1e-300,
+     write_coverage = TRUE,        # Also output gene coverage and missing-value statistics
+     verbose     = TRUE
+   )
+
+**Example console output**
+
+.. code-block:: text
+
+   New names:
+     • `` -> `...1`
+   New names:
+     • `` -> `...1`
+   [pair] Endothelial_filtered -> Erythrocyte_filtered ...
+   [pair] Erythrocyte_filtered -> Endothelial_filtered ...
+
+The function computes active/inhibitory communication scores between cell types and outputs both score matrices and coverage summaries.
+
+
+6.2 Global communication circos plot
+------------------------------------
+
+.. code-block:: r
+
+   library(DEVCOMSuiteR)
+
+   cell_types <- c("Decidual stroma", "Endothelial", "Erythrocyte", "Immune cell")
+
+   plot_global_comm_circos(
+     cell_types = cell_types,
+     base_path  = "./DEVCOM-Suite-R-main/tests/active_inhibit/active_inhibit_score"
+   )
+
+.. figure:: /_static/图片2.png
+   :width: 70%
+   :align: center
+
+.. figure:: /_static/图片3.png
+   :width: 70%
+   :align: center
+
+This generates a circos plot summarizing global communication intensity and direction between the specified cell types, using the active/inhibitory scores calculated above.
+
+
+7. Differential Communication Between Conditions
+================================================
+
+7.1 Running differential communication analysis
+-----------------------------------------------
+
+.. code-block:: r
+
+   library(DEVCOMSuiteR)
+   library(DevcomDB)
+
+   res <- run_diff_comm(
+     cell_types   = c("Erythrocyte", "Endothelial"),
+     ctrl_base    = "./DEVCOM-Suite-R-main/tests/IVF/",
+     case_base    = "./DEVCOM-Suite-R-main/tests/SCNT/",
+     lr_pairs_path = "./DEVCOM-Suite-R-main/testst/mouse_L-R-TF_develop.csv",
+     out_dir      = "./DEVCOM-Suite-R-main/tests/diff_comm_IVF_SCNT",
+     case_label   = "SCNT",
+     ctrl_label   = "IVF"
+   )
+
+**Example console output**
+
+.. code-block:: text
+
+   Loading control condition (IVF) ...
+   Loading case condition (SCNT) ...
+   Analyzing autocrine (self) communications ...
+   Analyzing interactions (sender != receiver) ...
+   Finished. Output files:
+     - E:/DEVCOM Suite/tests/testthat/diff_comm_IVF_SCNT/SCNT_vs_IVF_diff_comm_autocrine_interaction.csv
+     - E:/DEVCOM Suite/tests/testthat/diff_comm_IVF_SCNT/SCNT_vs_IVF_diff_comm_autocrine_only.csv
+     - E:/DEVCOM Suite/tests/testthat/diff_comm_IVF_SCNT/SCNT_vs_IVF_diff_comm_interaction_only.csv
+   Number of permutations (n_perm) = 1000
+
+This analysis compares communication strength between the control (IVF) and case (SCNT) conditions for the selected cell types. Permutation testing (here ``n_perm = 1000``) is used to assess significant differences in communication.
